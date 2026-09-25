@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id('product_id');
+
             $table->string('name');
-            $table->foreignId('category_id');
-            $table->decimal('base_price,8,2');
-            $table->string('image_path');
-            $table->boolean('is_active');
+
+            $table->foreignId('category_id')->constrained('categories',  'category_id')->restrictedOnDelete();
+            $table->decimal('base_price', 8, 2);
+            $table->string('image_path')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

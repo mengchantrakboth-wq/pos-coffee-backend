@@ -17,7 +17,21 @@ class Product extends Model
         'is_active'
     ];
 
+    protected $casts = [
+        'base_price' => 'decimal:2',
+        'is_active' => 'boolean',
+    ];
+
     public function categories(){
         return $this->belongsTo(Categories::class, 'category_id', 'category_id');
+    }
+
+    public function variants(){
+        return $this->hasMany(ProductVariant::class, 'product_id', 'product_id');
+    }
+
+    public function recipeItems()
+    {
+        return $this->hasMany(RecipeItem::class, 'product_id', 'product_id');
     }
 }

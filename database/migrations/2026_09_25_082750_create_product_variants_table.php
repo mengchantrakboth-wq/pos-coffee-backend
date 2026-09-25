@@ -12,8 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('product_variants', function (Blueprint $table) {
-            $table->id();
+            $table->id('variant_id');
+            $table->foreignId('product_id')->constrained('products', 'product_id')->cascadeOnDelete();
+
+            $table->string('size_name');
+            $table->decimal('price_modifier', 8, 2)->default(0.00);
             $table->timestamps();
+
+            $table->unique(['product_id', 'size_name']); // Ensure unique size names per product
         });
     }
 
