@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('recipe_items', function (Blueprint $table) {
-            $table->id();
+            $table->id('recipe_item_id');
+            $table->foreignId('product_id')->constrained('products', 'product_id')->restrictOnDelete();
+            $table->foreignId('ingredient_id')->constrained('ingredients', 'ingredient_id')->restrictOnDelete();
+            $table->decimal('quantity', 10, 2);
             $table->timestamps();
+            $table->unique('product_id', 'ingredient_id');
         });
     }
 
