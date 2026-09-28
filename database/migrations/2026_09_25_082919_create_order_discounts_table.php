@@ -12,7 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('order_discounts', function (Blueprint $table) {
-            $table->id();
+            $table->id('order_discount_id');
+            $table->foreignId('order_id')->constrained('orders', 'order_id')->cascadeOnDelete();
+            $table->foreignId('discount_id')->constrained('discounts', 'discount_id')->cascadeOnDelete();
+            $table->primary(['order_id', 'discount_id']);
             $table->timestamps();
         });
     }
