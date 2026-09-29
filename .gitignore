@@ -21,3 +21,5 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+er::create([
+sword_hash' => Hash::make('admin123'),
