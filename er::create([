@@ -1,0 +1,35 @@
+[90m= [39m[
+    {#7367
+      +"[1mcolumn_name[22m": [32m"[39m[32muser_id[39m[32m"[39m,
+    },
+    {#7365
+      +"[1mcolumn_name[22m": [32m"[39m[32mfull_name[39m[32m"[39m,
+    },
+    {#7391
+      +"[1mcolumn_name[22m": [32m"[39m[32musername[39m[32m"[39m,
+    },
+    {#7369
+      +"[1mcolumn_name[22m": [32m"[39m[32memail[39m[32m"[39m,
+    },
+    {#7359
+      +"[1mcolumn_name[22m": [32m"[39m[32memail_verified_at[39m[32m"[39m,
+    },
+    {#7363
+      +"[1mcolumn_name[22m": [32m"[39m[32mpassword_hash[39m[32m"[39m,
+    },
+    {#7370
+      +"[1mcolumn_name[22m": [32m"[39m[32mphone[39m[32m"[39m,
+    },
+    {#7371
+      +"[1mcolumn_name[22m": [32m"[39m[32mrole_id[39m[32m"[39m,
+    },
+    {#7372
+      +"[1mcolumn_name[22m": [32m"[39m[32mremember_token[39m[32m"[39m,
+    },
+    {#7378
+      +"[1mcolumn_name[22m": [32m"[39m[32mcreated_at[39m[32m"[39m,
+    },
+    {#7377
+      +"[1mcolumn_name[22m": [32m"[39m[32mupdated_at[39m[32m"[39m,
+    },
+  ]
