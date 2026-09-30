@@ -22,11 +22,20 @@ class Product extends Model
         'is_active' => 'boolean',
     ];
 
-    public function categories(){
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute()
+    {
+        return $this->image_path ? asset('storage/' . $this->image_path) : null;
+    }
+
+    public function categories()
+    {
         return $this->belongsTo(Categories::class, 'category_id', 'category_id');
     }
 
-    public function variants(){
+    public function variants()
+    {
         return $this->hasMany(ProductVariant::class, 'product_id', 'product_id');
     }
 

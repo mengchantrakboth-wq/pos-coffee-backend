@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes (no login needed)
@@ -19,7 +20,6 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
 });
 
-// Orders & Items (authenticated users)
 Route::middleware(['auth:sanctum'])->group(function () {
     // Orders
     Route::get('/orders', [OrderController::class, 'index']);
@@ -35,4 +35,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/orders/{order_id}/items', [OrderItemController::class, 'store']);
     Route::put('/orders/{order_id}/items/{item_id}', [OrderItemController::class, 'update']);
     Route::delete('/orders/{order_id}/items/{item_id}', [OrderItemController::class, 'destroy']);
+
+    // Products
+    Route::apiResource('products', ProductController::class);
 });
