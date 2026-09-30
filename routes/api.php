@@ -4,23 +4,24 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes (no login needed)
 Route::post('/login', [AuthController::class, 'login']);
 
 // Protected routes (must be logged in)
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:api')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
 // Admin only routes (must be logged in + admin role)
-Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+Route::middleware(['auth:api', 'admin'])->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
 });
 
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['auth:api'])->group(function () {
     // Orders
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders', [OrderController::class, 'store']);
@@ -38,4 +39,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Products
     Route::apiResource('products', ProductController::class);
+
+    //Categories
+    Route::apiResource('categories', CategoryController::class);
 });

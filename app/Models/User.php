@@ -2,23 +2,16 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
-    use HasApiTokens;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $primaryKey = 'user_id';
 
     protected $fillable = [
@@ -30,21 +23,11 @@ class User extends Authenticatable
         'role_id',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password_hash',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -52,10 +35,27 @@ class User extends Authenticatable
         ];
     }
 
+    // your column is password_hash, not password
+    public function getAuthPassword()
+    {
+        return $this->password_hash;
+    }
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return ['role_id' => $this->role_id];
+    }
+
     public function role()
     {
-        return $this->belongsTo(Role::class, 'role_id', 'role_id');  // ← belongsTo
+        return $this->belongsTo(Role::class, 'role_id', 'role_id');
     }
+
     public function orders()
     {
         return $this->hasMany(Order::class, 'user_id', 'user_id');

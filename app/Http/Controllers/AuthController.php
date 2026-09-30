@@ -3,132 +3,103 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Throwable;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    /**
-     * Register/Create new user (Admin only)
-     */
-    public function register(Request $request)
+    public function register(Request $request): JsonResponse
     {
         try {
-            $request->validate([
+            $data = $request->validate([
                 'full_name' => 'required|string|max:255',
-                'username' => 'required|string|unique:users,username|max:100',
-                'email' => 'required|email|unique:users,email',
-                'phone' => 'required|string|max:20',
-                'password' => 'required|string|min:6|confirmed',
-                'role_id' => 'required|integer|exists:roles,role_id',
+                'username'  => 'required|string|max:100|unique:users,username',
+                'email'     => 'required|email|unique:users,email',
+                'phone'     => 'required|string|max:20',
+                'password'  => 'required|string|min:6|confirmed',
+                'role_id'   => 'required|integer|exists:roles,role_id',
             ]);
 
             $user = User::create([
-                'full_name' => $request->full_name,
-                'username' => $request->username,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'password_hash' => Hash::make($request->password),
-                'role_id' => $request->role_id,
+                'full_name'     => $data['full_name'],
+                'username'      => $data['username'],
+                'email'         => $data['email'],
+                'phone'         => $data['phone'],
+                'password_hash' => Hash::make($data['password']),
+                'role_id'       => $data['role_id'],
             ]);
 
-            return response()->json([
-                'message' => 'Account created successfully',
-                'user' => $user,
-            ], 201);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'error' => 'Validation failed',
-                'messages' => $e->errors()
-            ], 422);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Failed to create account',
-                'message' => $e->getMessage()
-            ], 500);
+            return response()->json(['message' => 'Account created successfully', 'user' => $user], 201);
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            return $this->errorResponse($e, 'Failed to create account');
         }
     }
 
-    /**
-     * Login user
-     */
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
         try {
-            $request->validate([
+            $credentials = $request->validate([
                 'username' => 'required|string',
                 'password' => 'required|string',
             ]);
 
-            $user = User::where('username', $request->username)
-                ->orWhere('email', $request->email)
-                ->first();
-
-            if (!$user || !Hash::check($request->password, $user->password_hash)) {
-                return response()->json([
-                    'error' => 'Invalid credentials'
-                ], 401);
+            if (! $token = JWTAuth::attempt($credentials)) {
+                return response()->json(['error' => 'Invalid credentials'], 401);
             }
 
-            return response()->json([
-                'token' => $user->createToken('auth_token')->plainTextToken,
-                'user' => [
-                    'user_id' => $user->user_id,
-                    'full_name' => $user->full_name,
-                    'username' => $user->username,
-                    'email' => $user->email,
-                    'phone' => $user->phone,
-                    'role_id' => $user->role_id,
-                    'role' => $user->role,
-                ],
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'error' => 'Validation failed',
-                'messages' => $e->errors()
-            ], 422);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Login failed',
-                'message' => $e->getMessage()
-            ], 500);
+            return $this->respondWithToken($token);
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            return $this->errorResponse($e, 'Login failed');
         }
     }
 
-    /**
-     * Logout user
-     */
-    public function logout(Request $request)
+    public function me(): JsonResponse
+    {
+        return response()->json(['user' => JWTAuth::user()?->load('role')]);
+    }
+
+    public function refresh(): JsonResponse
     {
         try {
-            $request->user()->currentAccessToken()->delete();
-
-            return response()->json([
-                'message' => 'Logged out successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Failed to logout',
-                'message' => $e->getMessage()
-            ], 500);
+            return $this->respondWithToken(JWTAuth::refresh());
+        } catch (Throwable $e) {
+            return response()->json(['error' => 'Token cannot be refreshed'], 401);
         }
     }
 
-    /**
-     * Get current user info
-     */
-    public function me(Request $request)
+    public function logout(): JsonResponse
     {
-        try {
-            return response()->json([
-                'user' => $request->user(),
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Failed to fetch user',
-                'message' => $e->getMessage()
-            ], 500);
-        }
+        JWTAuth::logout();
+
+        return response()->json(['message' => 'Logged out successfully']);
+    }
+
+    private function respondWithToken(string $token): JsonResponse
+    {
+        return response()->json([
+            'token'      => $token,
+            'token_type' => 'bearer',
+            'expires_in' => JWTAuth::factory()->getTTL() * 60,
+            'user'       => JWTAuth::user()?->load('role'),
+        ]);
+    }
+
+    private function errorResponse(Throwable $e, string $message): JsonResponse
+    {
+        Log::error($message, ['error' => $e->getMessage()]);
+
+        return response()->json([
+            'error'   => $message,
+            'message' => config('app.debug') ? $e->getMessage() : null,
+        ], 500);
     }
 }
