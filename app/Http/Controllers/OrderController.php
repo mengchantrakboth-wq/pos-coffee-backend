@@ -64,7 +64,7 @@ class OrderController extends Controller
 
             $order = Order::create([
                 'customer_id' => $request->customer_id ?? 1,  // ← Default to walk-in
-                'user_id' => Auth::id(),
+                'user_id' => auth('api')->id() ?? 1,  // ← Default to system user
                 'table_id' => $request->table_id,
                 'order_date' => now(),
                 'order_type' => $request->order_type,
