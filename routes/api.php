@@ -2,9 +2,12 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductVariantController;
+use App\Http\Controllers\TableController;
 use Illuminate\Support\Facades\Route;
 
 // Public
@@ -37,6 +40,15 @@ Route::middleware('auth:api')->group(function () {
 
     // Categories
     Route::apiResource('categories', CategoryController::class);
+
+    // Product Variants
+    Route::apiResource('variants', ProductVariantController::class);
+
+    // Customers
+    Route::apiResource('customers', CustomerController::class);
+
+    //tables
+    Route::apiResource('tables', TableController::class);
 });
 
 // Admin only (Super Admin / Manager)

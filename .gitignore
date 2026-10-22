@@ -23,3 +23,4 @@ yarn-error.log
 /.zed
 er::create([
 sword_hash' => Hash::make('admin123'),
+/.UserSeeder.php

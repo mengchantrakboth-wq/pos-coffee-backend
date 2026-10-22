@@ -12,8 +12,11 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            RoleSeeder::class,
-            UserSeeder::class,
+            RoleSeeder::class, // user need role to login
+            UserSeeder::class, // need user 1 role to login
+            VariantSeeder::class, // need variant to create product
+            CustomerSeeder::class, //walk-in customer need to create order
+            TableSeeder::class, // need table to create order
         ]);
     }
 }
