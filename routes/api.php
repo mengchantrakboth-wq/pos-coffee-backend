@@ -19,7 +19,15 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // Orders (today/status must stay above {order_id})
+
+});
+
+// Admin only (Super Admin / Manager)
+Route::middleware(['auth:api', 'admin'])->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+});
+
+ // Orders (today/status must stay above {order_id})
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders', [OrderController::class, 'store']);
     Route::get('/orders/today', [OrderController::class, 'getTodayOrders']);
@@ -49,9 +57,3 @@ Route::middleware('auth:api')->group(function () {
 
     //tables
     Route::apiResource('tables', TableController::class);
-});
-
-// Admin only (Super Admin / Manager)
-Route::middleware(['auth:api', 'admin'])->group(function () {
-    Route::post('/register', [AuthController::class, 'register']);
-});
