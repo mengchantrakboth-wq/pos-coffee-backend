@@ -5,6 +5,8 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductVariantController;
+use App\Models\ProductVariant;
 use Illuminate\Support\Facades\Route;
 
 // Public
@@ -38,6 +40,8 @@ Route::middleware('auth:api')->group(function () {
     // Categories
     Route::apiResource('categories', CategoryController::class);
 });
+
+Route::apiResource('variants', ProductVariantController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
 
 // Admin only (Super Admin / Manager)
 Route::middleware(['auth:api', 'admin'])->group(function () {
